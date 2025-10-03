@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ma Carte Leaflet OSM</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        /* Définir une hauteur pour le conteneur de la carte */
+        #mapid { height: 500px; width: 100%; } 
+    </style>
+</head>
+<body>
+
+    <div id="mapid"></div>
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> 
+
+<script>
+    // 1. Initialiser la carte OSM (comme avant)
+    const map = L.map('mapid').setView([48.8566, 2.3522], 10); 
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // 2. Charger le fichier GeoJSON (remplacez 'mes_donnees.geojson' par le nom de votre fichier)
+    fetch('CANA_AIRLIQUID.geojson')
+        .then(response => response.json())
+        .then(data => {
+            // 3. Ajouter les données GeoJSON à la carte
+            L.geoJSON(data, {
+                // Cette fonction est facultative : elle personnalise l'affichage de chaque élément
+                onEachFeature: function(feature, layer) {
+                    // Si l'élément a une propriété "name" (nom), on lui ajoute un pop-up
+                    if (feature.properties && feature.properties.name) {
+                        layer.bindPopup("<b>" + feature.properties.name + "</b>");
+                    }
+                }
+            }).addTo(map);
+            
+            // OPTIONNEL : Centrer la carte sur les données chargées
+            // map.fitBounds(L.geoJSON(data).getBounds()); 
+        })
+        .catch(error => console.error('Erreur de chargement du GeoJSON :', error));
+
+</script>
+
+</body>
+</html>
